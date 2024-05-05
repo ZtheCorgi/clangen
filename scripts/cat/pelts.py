@@ -31,6 +31,7 @@ class Pelt():
         'Masked': 'masked',
         'Fog': 'fog',
         'Mist': 'mist',
+        'Smudge': 'smudge',
         'Tortie': None,
         'Calico': None
     }
@@ -75,11 +76,12 @@ class Pelt():
                       'MOTTLED', 'SIDEMASK', 'EYEDOT', 'BANDANA', 'PACMAN', 'STREAMSTRIKE', 'SMUDGED', 'DAUB', 'EMBER', 'BRIE',
                       'ORIOLE', 'ROBIN', 'BRINDLE', 'PAIGE', 'ROSETAIL', 'SAFI', 'DAPPLENIGHT', 'BLANKET', 'BELOVED',
                       'VIPER', 'SKULL', 'POINTS', 'DITTO', 'BODY', 'SHILOH', 'TABBY', 'SPECKLED', 'BENGAL', 'CLASSIC', 'MACKEREL', 'MARBLED',
-                      'SABER', 'ROSETTE', 'MASKED', 'DUST']
+                      'SABER', 'ROSETTE', 'MASKED', 'DUST', 'MAXIMUMONE', 'MAXIMUMTWO', 'MAXIMUMTHREE', 'MAXIMUMFOUR', 'MAXIMUMFIVE',
+                      'MAXIMUMSIX', 'MAXIMUMSEVEN', 'MAXIMUMEIGHT']
 
     tortiebases = ['single', 'tabby', 'bengal', 'marbled', 'ticked', 'smoke', 'rosette', 'speckled', 'mackerel',
                    'classic', 'sokoke', 'agouti', 'singlestripe', 'abyssinian', 'brindle', 'braided', 'splotch',
-                   'saber', 'faded', 'masked', 'fog', 'mist']
+                   'saber', 'faded', 'masked', 'fog', 'mist', 'smudge']
 
 
     pelt_length = ["short", "medium", "long"]
@@ -136,7 +138,7 @@ class Pelt():
 
     points = ["Ticked", "Agouti", "Smoke", "Mist", "Fog"]
     spots = ["Speckled", "Rosette", "Bengal"]
-    swirls = ["Tabby", "Classic", "Sokoke", "Marbled"]
+    swirls = ["Tabby", "Classic", "Sokoke", "Marbled", "Smudge"]
     flats = ["SingleColour", "TwoColour", "Singlestripe", "Abyssinian"]
     stripes = ["Mackerel", "Braided", "Brindle"]
     splotches = ["Splotch", "Masked"]
@@ -189,7 +191,7 @@ class Pelt():
     mostly_white = ['VAN', 'ONEEAR', 'LIGHTSONG', 'TAIL', 'HEART', 'MOORISH', 'APRON', 'CAPSADDLE',
                     'CHESTSPECK', 'BLACKSTAR', 'PETAL', 'HEARTTWO', 'MOTH', 'FRECKLEMASK', 'COW', 'TIDAL',
                     'DIAMOND', 'ECLIPSE', 'PEBBLESHINE', 'BOOTS', 'COWTHREE', 'COWFIVE', 'COWSEVEN', 'COWNINE', 'COWTEN',
-                    'LOVEBUG', 'SHOOTINGSTAR', 'EYESPOT', 'PEBBLE', 'TAILTWO', 'BUDDY', 'BATWING', 'KROPKA']
+                    'LOVEBUG', 'SHOOTINGSTAR', 'EYESPOT', 'PEBBLE', 'TAILTWO', 'BUDDY', 'BATWING', 'KROPKA', "SMALLPATCHES"]
     point_markings = ['COLOURPOINT', 'RAGDOLL', 'SEPIAPOINT', 'MINKPOINT', 'SEALPOINT']
     vit = ['VITILIGO', 'VITILIGOTWO', 'MOON', 'PHANTOM', 'KARPATI', 'POWDER', 'SPLAT', 'BLEACHED', 'SMOKEY']
     white_sprites = [
@@ -871,7 +873,7 @@ class Pelt():
                     # Normal generation
                     if self.tortiebase in ["single"]:
                         self.tortiepattern = choice(['tabby', 'mackerel', 'classic', 'single', 'masked', 'brindle',
-                                                     'marbled', 'saber', 'bengal', 'rosette', 'speckled'])
+                                                     'marbled', 'saber', 'bengal', 'rosette', 'speckled', 'sokoke'])
                     else:
                         self.tortiepattern = random.choices([self.tortiebase, 'single'], weights=[97, 3], k=1)[0]
 
@@ -883,7 +885,7 @@ class Pelt():
                         self.tortiecolour = choice(Pelt.blue_colours + Pelt.gold_colours + (Pelt.fire_colours * 4) + (
                                     Pelt.ginger_colours * 4) + Pelt.coolbrown_colours + Pelt.lavender_colours + Pelt.warmbrown_colours + Pelt.brown_colours)
                     elif self.colour in Pelt.white_colours:
-                        self.tortiecolour = choice(Pelt.white_colours + (Pelt.cream_colours * 2) + (Pelt.blue_colours * 2) + Pelt.black_colours)
+                        self.tortiecolour = choice((Pelt.cream_colours * 2) + (Pelt.blue_colours * 2) + Pelt.black_colours)
                     elif self.colour in Pelt.blue_colours:
                         self.tortiecolour = choice(Pelt.black_colours + (
                                     Pelt.cream_colours * 4) + Pelt.gold_colours + Pelt.fire_colours + Pelt.ginger_colours + Pelt.warmbrown_colours + Pelt.coolbrown_colours)
@@ -1246,7 +1248,8 @@ class Pelt():
             "Faded": "c_n faded tabby",
             "Masked": "c_n masked tabby",
             "Fog": "c_n foggy tabby",
-            "Mist": "c_n misted tabby"
+            "Mist": "c_n misted tabby",
+            "Smudge": "c_n smudge tabby"
         }
 
         # Start with determining the base color name. 
