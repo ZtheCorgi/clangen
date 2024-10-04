@@ -16,6 +16,7 @@ import ujson
 from scripts.cat.cats import Cat, cat_class, BACKSTORIES
 from scripts.cat.history import History
 from scripts.cat.names import Name
+from scripts.cat.skills import SkillPath
 from scripts.clan import HERBS
 from scripts.clan_resources.freshkill import FRESHKILL_EVENT_ACTIVE
 from scripts.conditions import (
@@ -1469,89 +1470,180 @@ class Events:
 
                     # assign chance to become med app depending on current med cat and traits
                     chance = game.config["roles"]["base_medicine_app_chance"]
+                    print(f"Medcat app {cat.name} starting chance: {chance}")
                     if has_elder_med == med_cat_list:
                         # These chances apply if all the current medicine cats are elders.
                         if has_med:
                             chance = int(chance / 2.22)
+                            print(f"Senior medicine cat")
+                            print(f"Chance updated to {chance}")
                         else:
                             chance = int(chance / 13.67)
+                            print(f"Senior medicine cat")
+                            print (f"Not enough healthy medicine cats")
+                            print(f"Chance updated to {chance}")
+                            if has_med_app:
+                                chance = int(chance * 3.5)
+                                print(f"There is a medicine cat apprentice")
+                                print(f"Chance updated to {chance}")
+
                     elif very_old_med == med_cat_list:
                         # These chances apply is all the current medicine cats are very old.
                         if has_med:
                             chance = int(chance / 3)
+                            print (f"Very old medicine cat")
+                            print(f"Chance updated to {chance}")
                         else:
                             chance = int(chance / 14)
+                            print (f"Very old medicine cat")
+                            print (f"Not enough healthy medicine cats")
+                            print(f"Chance updated to {chance}")
+                            if has_med_app:
+                                chance = int(chance * 3.5)
+                                print(f"There is a medicine cat apprentice")
+                                print(f"Chance updated to {chance}")
+
                     # These chances will only be reached if the
                     # Clan has at least one non-elder medicine cat.
                     elif not has_med:
                         chance = int(chance / 7.125)
+                        print (f"Not enough healthy medicine cats")
+                        print(f"Chance updated to {chance}")
+                        if has_med_app:
+                            chance = int(chance * 3.5)
+                            print(f"There is a medicine cat apprentice")
+                            print(f"Chance updated to {chance}")
                     elif has_med:
                         chance = int(chance * 2.22)
+                        print(f"You have enough medicine cats")
+                        print(f"Chance updated to {chance}")
+
+                    if cat.skills.primary.path in [
+                        SkillPath.HUNTER, SkillPath.FIGHTER, SkillPath.MEDIATOR, SkillPath.RUNNER, SkillPath.FIGHTER, SkillPath.SWIMMER, SkillPath.KIT, SkillPath.CAMP, SkillPath.DARK
+                        ]:
+                        chance = int(chance * 2.5)
+                        print(f"{cat.name} {cat.skills.primary.skill}")
+                        print(f"Chance updated to {chance}")
+                        
+                    if cat.personality.trait in [
+                        'bloodthirsty', 'fierce', 'troublesome', 'cold', 'adventurous', 'arrogant', 'rebellious', 'ambitious', 'competitive'
+                        ]:
+                        chance = int(chance * 2)
+                        print(f"{cat.name} {cat.personality.trait}")
+                        print(f"Chance updated to {chance}")
 
                     if cat.personality.trait in [
-                        "careful",
-                        "compassionate",
-                        "loving",
-                        "wise",
-                        "faithful",
-                    ]:
-                        chance = int(chance / 1.3)
-                    if cat.is_disabled():
+                        'compassionate', 'wise', 'faithful', 'loving', 'responsible', 'grumpy', 'strange', 'thoughtful', 'lonesome', 'loving'
+                        ]:
                         chance = int(chance / 2)
+                        print(f"{cat.name} {cat.personality.trait}")
+                        print(f"Chance updated to {chance}")
+
+                    if cat.skills.secondary and cat.skills.secondary.path in [
+                        SkillPath.OMEN, SkillPath.PROPHET, SkillPath.HEALER, SkillPath.STAR, SkillPath.DREAM, SkillPath.CLAIRVOYANT, SkillPath.GHOST, SkillPath.LORE
+                        ]:
+                        chance = int(chance / 2)
+                        print(f"{cat.name} {cat.skills.secondary.skill}")
+                        print(f"Chance updated to {chance}")
+
+                    if cat.skills.primary.path in [
+                        SkillPath.OMEN, SkillPath.PROPHET, SkillPath.HEALER, SkillPath.STAR, SkillPath.DREAM, SkillPath.CLAIRVOYANT, SkillPath.GHOST, SkillPath.LORE
+                        ]:
+                        chance = int(chance / 2.5)
+                        print(f"{cat.name} {cat.skills.primary.skill}")
+                        print(f"Chance updated to {chance}")
+
+                    if cat.is_disabled():
+                        chance = int(chance / 1.5)
+                        print(f"{cat.name} is disabled")
+                        print (f"Chance updated to {chance}")
 
                     if chance == 0:
                         chance = 1
+                    print(f"Final medcat app chance {cat.name}: {chance}")
 
-                    if not has_med_app and not int(random.random() * chance):
+                    if not int(random.random() * chance):
                         self.ceremony(cat, "medicine cat apprentice")
                         self.ceremony_accessory = True
                         self.gain_accessories(cat)
+                        print(f"Made {cat.name} medicine cat apprentice")
+
                     else:
                         # Chance for mediator apprentice
                         mediator_list = list(
                             filter(
-                                lambda x: x.status == "mediator"
-                                and not x.dead
-                                and not x.outside,
-                                Cat.all_cats_list,
-                            )
-                        )
-
-                        # This checks if at least one mediator already has an apprentice.
-                        has_mediator_apprentice = False
-                        for c in mediator_list:
-                            if c.apprentice:
-                                has_mediator_apprentice = True
-                                break
+                                lambda x: x.status == "mediator" and not x.dead
+                                          and not x.outside, Cat.all_cats_list))
 
                         chance = game.config["roles"]["mediator_app_chance"]
-                        if cat.personality.trait in [
-                            "charismatic",
-                            "loving",
-                            "responsible",
-                            "wise",
-                            "thoughtful",
-                        ]:
-                            chance = int(chance / 1.5)
-                        if cat.is_disabled():
-                            chance = int(chance / 2)
 
-                        if chance == 0:
-                            chance = 1
-
-                        # Only become a mediator if there is already one in the clan.
-                        if (
-                            mediator_list
-                            and not has_mediator_apprentice
-                            and not int(random.random() * chance)
-                        ):
-                            self.ceremony(cat, "mediator apprentice")
-                            self.ceremony_accessory = True
-                            self.gain_accessories(cat)
-                        else:
+                        if not mediator_list:
                             self.ceremony(cat, "apprentice")
                             self.ceremony_accessory = True
                             self.gain_accessories(cat)
+                            print (f"No mediators")
+                            print(f"Made {cat.name} warrior apprentice")
+                            
+                        else:
+                            print(f"Mediator app {cat.name} starting chance: {chance}")
+
+                            if cat.personality.trait in [
+                                "bloodthirsty", "fierce", "grumpy", "cold", "lonesome", "insecure", "ambitious", "competitive", "childish", "adventurous", "daring"
+                            ]:
+                                chance = int (chance * 1.5)
+                                print(f"{cat.name} {cat.personality.trait}")
+                                print(f"Chance updated to {chance}")
+
+                            if cat.skills.primary.path in [
+                                SkillPath.HUNTER, SkillPath.FIGHTER, SkillPath.CLIMBER, SkillPath.SWIMMER, SkillPath.DARK
+                            ]:
+                                chance = int (chance * 2)
+                                print(f"{cat.name} {cat.skills.primary.skill}")
+                                print(f"Chance updated to {chance}")
+
+                            if cat.personality.trait in [
+                                'charismatic', 'thoughtful', 'calm', 'wise', 'sincere', 'nervous', 'compassionate', 'flamboyant', 'sincere', 'playful', 'calm'
+                            ]:
+                                chance = int (chance / 1.5)
+                                print(f"{cat.name} {cat.personality.trait}")
+                                print(f"Chance updated to {chance}")
+
+                            if cat.skills.secondary and cat.skills.secondary.path in [
+                                SkillPath.MEDIATOR, SkillPath.CLEVER, SkillPath.SPEAKER, SkillPath.INSIGHTFUL, SkillPath.CAMP, SkillPath.KIT, SkillPath.CLAIRVOYANT
+                            ]:
+                                chance = int(chance / 1.5)
+                                print(f"{cat.name} {cat.skills.secondary.skill}")
+                                print(f"Chance updated to {chance}")
+
+                            if cat.skills.primary.path in [
+                                SkillPath.MEDIATOR, SkillPath.CLEVER, SkillPath.SPEAKER, SkillPath.INSIGHTFUL, SkillPath.CAMP, SkillPath.KIT, SkillPath.CLAIRVOYANT
+                            ]:
+                                chance = int(chance / 2)
+                                print(f"{cat.name} {cat.skills.primary.skill}")
+                                print(f"Chance updated to {chance}")
+
+                            if cat.is_disabled():
+                                chance = int(chance / 2)
+                                print(f"{cat.name} is disabled")
+                                print (f"Chance updated to {chance}")
+
+                            if chance == 0:
+                                chance = 1
+                            print(f"Final mediator app chance {cat.name}: {chance}")
+
+                            # Only become a mediator if there is already one in the clan.
+                            if mediator_list and \
+                                    not int(random.random() * chance):
+                                self.ceremony(cat, "mediator apprentice")
+                                self.ceremony_accessory = True
+                                self.gain_accessories(cat)
+                                print(f"Made {cat.name} mediator apprentice")
+
+                            else:
+                                self.ceremony(cat, "apprentice")
+                                self.ceremony_accessory = True
+                                self.gain_accessories(cat)
+                                print(f"Made {cat.name} warrior apprentice")
 
             # graduate
             if cat.status in [
