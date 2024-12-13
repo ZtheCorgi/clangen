@@ -1499,42 +1499,42 @@ class Events:
                         print(f"Chance updated to {chance}")
 
                     if cat.skills.primary.path in [
-                        SkillPath.HUNTER, SkillPath.FIGHTER, SkillPath.MEDIATOR, SkillPath.RUNNER, SkillPath.FIGHTER, SkillPath.SWIMMER, SkillPath.KIT, SkillPath.CAMP, SkillPath.DARK
+                        SkillPath.HUNTER, SkillPath.FIGHTER, SkillPath.RUNNER, SkillPath.SWIMMER, SkillPath.DARK
                         ]:
-                        chance = int(chance * 2.5)
+                        chance = int(chance * 1.5)
                         print(f"{cat.name} {cat.skills.primary.skill}")
                         print(f"Chance updated to {chance}")
                         
                     if cat.personality.trait in [
-                        'bloodthirsty', 'fierce', 'troublesome', 'cold', 'adventurous', 'arrogant', 'rebellious', 'ambitious', 'competitive'
+                        'adventurous', 'arrogant', 'bold', 'bloodthirsty', 'cold', 'fierce', 'rebellious', 'troublesome', 'sneaky', 'vengeful'
                         ]:
                         chance = int(chance * 2)
                         print(f"{cat.name} {cat.personality.trait}")
                         print(f"Chance updated to {chance}")
 
                     if cat.personality.trait in [
-                        'compassionate', 'wise', 'faithful', 'loving', 'responsible', 'grumpy', 'strange', 'thoughtful', 'lonesome', 'loving'
+                        'ambitious', 'compassionate', 'grumpy', 'gloomy', 'lonesome', 'loving', 'responsible', 'righteous', 'thoughtful', 'wise'
                         ]:
                         chance = int(chance / 2)
                         print(f"{cat.name} {cat.personality.trait}")
                         print(f"Chance updated to {chance}")
 
                     if cat.skills.secondary and cat.skills.secondary.path in [
-                        SkillPath.OMEN, SkillPath.PROPHET, SkillPath.HEALER, SkillPath.STAR, SkillPath.DREAM, SkillPath.CLAIRVOYANT, SkillPath.GHOST, SkillPath.LORE
+                        SkillPath.OMEN, SkillPath.PROPHET, SkillPath.HEALER, SkillPath.STAR, SkillPath.DREAM, SkillPath.CLAIRVOYANT, SkillPath.GHOST, SkillPath.CAMP
                         ]:
                         chance = int(chance / 2)
                         print(f"{cat.name} {cat.skills.secondary.skill}")
                         print(f"Chance updated to {chance}")
 
                     if cat.skills.primary.path in [
-                        SkillPath.OMEN, SkillPath.PROPHET, SkillPath.HEALER, SkillPath.STAR, SkillPath.DREAM, SkillPath.CLAIRVOYANT, SkillPath.GHOST, SkillPath.LORE
+                        SkillPath.OMEN, SkillPath.PROPHET, SkillPath.HEALER, SkillPath.STAR, SkillPath.DREAM, SkillPath.CLAIRVOYANT, SkillPath.GHOST, SkillPath.CAMP
                         ]:
-                        chance = int(chance / 2.5)
+                        chance = int(chance / 2)
                         print(f"{cat.name} {cat.skills.primary.skill}")
                         print(f"Chance updated to {chance}")
 
                     if cat.is_disabled():
-                        chance = int(chance / 1.5)
+                        chance = int(chance / 1.3)
                         print(f"{cat.name} is disabled")
                         print (f"Chance updated to {chance}")
 
@@ -1568,42 +1568,42 @@ class Events:
                             print(f"Mediator app {cat.name} starting chance: {chance}")
 
                             if cat.personality.trait in [
-                                "bloodthirsty", "fierce", "grumpy", "cold", "lonesome", "insecure", "ambitious", "competitive", "childish", "adventurous", "daring"
+                                'ambitious', 'adventurous', 'arrogant', 'bold', 'bloodthirsty', 'cold', 'competitive', 'grumpy', 'insecure', 'oblivious'
                             ]:
-                                chance = int (chance * 1.5)
+                                chance = int (chance * 2)
                                 print(f"{cat.name} {cat.personality.trait}")
                                 print(f"Chance updated to {chance}")
 
                             if cat.skills.primary.path in [
                                 SkillPath.HUNTER, SkillPath.FIGHTER, SkillPath.CLIMBER, SkillPath.SWIMMER, SkillPath.DARK
                             ]:
-                                chance = int (chance * 2)
+                                chance = int (chance * 1.5)
                                 print(f"{cat.name} {cat.skills.primary.skill}")
                                 print(f"Chance updated to {chance}")
 
                             if cat.personality.trait in [
-                                'charismatic', 'thoughtful', 'calm', 'wise', 'sincere', 'nervous', 'compassionate', 'flamboyant', 'sincere', 'playful', 'calm'
+                                'calm', 'charismatic', 'flamboyant', 'nervous', 'playful', 'thoughtful', 'sincere', 'wise'
                             ]:
                                 chance = int (chance / 1.5)
                                 print(f"{cat.name} {cat.personality.trait}")
                                 print(f"Chance updated to {chance}")
 
                             if cat.skills.secondary and cat.skills.secondary.path in [
-                                SkillPath.MEDIATOR, SkillPath.CLEVER, SkillPath.SPEAKER, SkillPath.INSIGHTFUL, SkillPath.CAMP, SkillPath.KIT, SkillPath.CLAIRVOYANT
+                                SkillPath.MEDIATOR, SkillPath.SPEAKER, SkillPath.INSIGHTFUL, SkillPath.CLAIRVOYANT, SkillPath.LORE
                             ]:
                                 chance = int(chance / 1.5)
                                 print(f"{cat.name} {cat.skills.secondary.skill}")
                                 print(f"Chance updated to {chance}")
 
                             if cat.skills.primary.path in [
-                                SkillPath.MEDIATOR, SkillPath.CLEVER, SkillPath.SPEAKER, SkillPath.INSIGHTFUL, SkillPath.CAMP, SkillPath.KIT, SkillPath.CLAIRVOYANT
+                                SkillPath.MEDIATOR, SkillPath.SPEAKER, SkillPath.INSIGHTFUL, SkillPath.CLAIRVOYANT, SkillPath.LORE
                             ]:
                                 chance = int(chance / 2)
                                 print(f"{cat.name} {cat.skills.primary.skill}")
                                 print(f"Chance updated to {chance}")
 
                             if cat.is_disabled():
-                                chance = int(chance / 2)
+                                chance = int(chance / 1.3)
                                 print(f"{cat.name} is disabled")
                                 print (f"Chance updated to {chance}")
 
