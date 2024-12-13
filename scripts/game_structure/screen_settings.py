@@ -2,6 +2,8 @@ from typing import TYPE_CHECKING
 
 import ujson
 
+from scripts.housekeeping.datadir import get_save_dir
+
 if TYPE_CHECKING:
     from scripts.screens.Screens import Screens
 
@@ -75,7 +77,7 @@ def set_display_mode(
         display_size = display_sizes[screen_config["fullscreen_display"]]
         # display_size = [3840, 2160]
 
-        determine_screen_scale(display_size[0], display_size[1])
+        determine_screen_scale(display_size[0], display_size[1], ingame_switch)
 
         screen = pygame.display.set_mode(
             display_size, pygame.FULLSCREEN, display=screen_config["fullscreen_display"]
@@ -112,7 +114,6 @@ def set_display_mode(
         if old_scale != screen_scale:
             from scripts.screens.all_screens import AllScreens
             import scripts.screens.screens_core.screens_core
-            import scripts.debug_menu
 
             game.save_settings(currentscreen=source_screen)
             source_screen.exit_screen()
@@ -135,7 +136,7 @@ def set_display_mode(
             AllScreens.rebuild_all_screens()
 
             scripts.screens.screens_core.screens_core.rebuild_core()
-            scripts.debug_menu.debugmode.rebuild_console()
+            scripts.debug_console.debug_mode.rebuild_console()
 
             screen_name = source_screen.name.replace(" ", "_")
             new_screen: "Screens" = getattr(AllScreens, screen_name)
@@ -201,14 +202,32 @@ def set_display_mode(
         ConfirmDisplayChanges(source_screen=source_screen)
 
 
-def determine_screen_scale(x, y):
+def determine_screen_scale(x, y, ingame_switch):
     global screen_scale, screen_x, screen_y, offset, game_screen_size
-    # this means screen scales in multiples of 200 x 175 which has a reasonable tradeoff for crunch
-    scalex = x // 200
-    scaley = y // 175
-    screen_scale = min(scalex, scaley) / 4
-    screen_x = 800 * screen_scale
-    screen_y = 700 * screen_scale
+
+    if ingame_switch:
+        from scripts.game_structure.game_essentials import game
+
+        screen_config = game.settings
+    else:
+        with open(get_save_dir() + "/settings.json", "r") as read_config:
+            screen_config = ujson.load(read_config)
+
+    if "fullscreen scaling" in screen_config and screen_config["fullscreen scaling"]:
+        scalex = (x - 20) // 80
+        scaley = (y - 20) // 70
+
+        screen_scale = min(scalex, scaley) / 10
+
+        screen_x = 800 * screen_scale
+        screen_y = 700 * screen_scale
+    else:
+        # this means screen scales in multiples of 200 x 175 which has a reasonable tradeoff for crunch
+        scalex = x // 200
+        scaley = y // 175
+        screen_scale = min(scalex, scaley) / 4
+        screen_x = 800 * screen_scale
+        screen_y = 700 * screen_scale
 
     offset = (
         floor((x - screen_x) / 2),
