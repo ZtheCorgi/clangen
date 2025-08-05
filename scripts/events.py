@@ -17,6 +17,7 @@ from scripts.cat import save_load
 from scripts.cat.cats import Cat, cat_class, BACKSTORIES
 from scripts.cat.enums import CatAge, CatRank, CatGroup, CatStanding, CatSocial
 from scripts.cat.names import Name
+from scripts.cat.skills import SkillPath
 from scripts.cat.save_load import save_cats, add_cat_to_fade_id
 from scripts.clan_package.settings import get_clan_setting, set_clan_setting
 from scripts.clan_resources.freshkill import FRESHKILL_EVENT_ACTIVE
@@ -328,12 +329,12 @@ class Events:
                 string = i18n.t("defaults.warn_low_medcats")
                 game.cur_events_list.insert(0, Single_Event(string, "health", clan=game.clan.enum))
         else:
-            has_med = any(
+            has_working_med = any(
                 cat.status.rank.is_any_medicine_rank()
                 and cat.status.alive_in_player_clan
                 for cat in Cat.all_cats.values()
             )
-            if not has_med:
+            if not has_working_med:
                 string = i18n.t("defaults.warn_no_medcats")
                 game.cur_events_list.insert(0, Single_Event(string, "health", clan=game.clan.enum))
         if clancount:
@@ -1444,21 +1445,8 @@ class Events:
                         and i.status.group == clan.enum
                     ]
 
-                    # check if the healer is an elder
-                    has_elder_med = [
-                        c
-                        for c in med_cat_list
-                        if c.age == "senior" and c.status.rank == CatRank.MEDICINE_CAT
-                    ]
-
-                    very_old_med = [
-                        c
-                        for c in med_cat_list
-                        if c.moons >= 150 and c.status.rank == CatRank.MEDICINE_CAT
-                    ]
-
                     # check if the Clan has sufficient med cats
-                    has_med = medicine_cats_can_cover_clan(
+                    has_working_med = medicine_cats_can_cover_clan(
                         Cat.all_cats.values(),
                         amount_per_med=get_amount_cat_for_one_medic(clan.enum),
                         clan=clan.enum
@@ -1470,45 +1458,149 @@ class Events:
                         for cat in med_cat_list
                     )
 
+                    # check if all medicine cats are old
+                    senior_meds = all([c.age == CatAge.SENIOR for c in med_cat_list])
+
+                    # check if all medicine cats are VERY old
+                    very_old_meds = all([c.moons >= 150 for c in med_cat_list])
+
                     # assign chance to become med app depending on current med cat and traits
-                    chance = constants.CONFIG["roles"]["base_medicine_app_chance"]
-                    if has_elder_med == med_cat_list:
-                        # These chances apply if all the current healers are elders.
-                        if has_med:
-                            chance = int(chance / 2.22)
+                    chance = max(
+                        constants.CONFIG["roles"]["base_medicine_app_chance"], 1
+                    )
+                    print(f"Medcat app {cat.name} starting chance: {chance}")
+                    if very_old_meds:
+                        # These chances apply if all the current medicine cats are very old.
+                        if has_working_med:
+                            chance = max(1, int(chance / 3))
+                            print(f"Very old medicine cat")
+                            print(f"Chance updated to {chance}")
                         else:
-                            chance = int(chance / 13.67)
-                    elif very_old_med == med_cat_list:
-                        # These chances apply is all the current healers are very old.
-                        if has_med:
-                            chance = int(chance / 3)
+                            chance = max(1, int(chance / 14))
+                            print(f"Very old medicine cat")
+                            print(f"Not enough healthy medicine cats")
+                            print(f"Chance updated to {chance}")
+
+                    elif senior_meds:
+                        # These chances apply if all the current medicine cats are seniors.
+                        if has_working_med:
+                            chance = max(1, int(chance / 2.22))
+                            print(f"Senior medicine cat")
+                            print(f"Chance updated to {chance}")
                         else:
-                            chance = int(chance / 14)
+                            chance = max(1, int(chance / 13.67))
+                            print(f"Senior medicine cat")
+                            print(f"Not enough healthy medicine cats")
+                            print(f"Chance updated to {chance}")
+
                     # These chances will only be reached if the
-                    # Clan has at least one non-elder healer.
-                    elif not has_med:
-                        chance = int(chance / 7.125)
-                    elif has_med:
-                        chance = int(chance * 2.22)
+                    # Clan has at least one non-elder medicine cat.
+                    elif not has_working_med:
+                        chance = max(1, int(chance / 7.125))
+                        print(f"Not enough healthy medicine cats")
+                        print(f"Chance updated to {chance}")
+
+                    elif has_working_med:
+                        chance = max(1, int(chance * 2.22))
+                        print(f"You have enough medicine cats")
+                        print(f"Chance updated to {chance}")
+
+                    # if there is already a medicine apprentice
+                    # allow it, but reduce the chance
+                    if has_med_app:
+                        chance = max(1, int(chance * 3.5))
+                        print(f"There is a medicine cat apprentice")
+                        print(f"Chance updated to {chance}")
+
+                    # check for incompatible traits and skills
+                    if cat.skills.primary.path in [
+                        SkillPath.HUNTER,
+                        SkillPath.FIGHTER,
+                        SkillPath.RUNNER,
+                        SkillPath.SWIMMER,
+                        SkillPath.DARK,
+                    ]:
+                        chance = max(1, int(chance * 1.5))
+                        print(f"{cat.name} {cat.skills.primary.skill}")
+                        print(f"Chance updated to {chance}")
 
                     if cat.personality.trait in [
-                        "careful",
-                        "compassionate",
-                        "loving",
-                        "wise",
-                        "faithful",
+                        "adventurous",
+                        "arrogant",
+                        "bold",
+                        "bloodthirsty",
+                        "cold",
+                        "fierce",
+                        "rebellious",
+                        "troublesome",
+                        "sneaky",
+                        "vengeful",
                     ]:
-                        chance = int(chance / 1.3)
+                        chance = max(1, int(chance * 2))
+                        print(f"{cat.name} {cat.personality.trait}")
+                        print(f"Chance updated to {chance}")
+
+                    # now check for compatible traits and skills
+                    if cat.skills.secondary and cat.skills.secondary.path in [
+                        SkillPath.OMEN,
+                        SkillPath.PROPHET,
+                        SkillPath.HEALER,
+                        SkillPath.STAR,
+                        SkillPath.DREAM,
+                        SkillPath.CLAIRVOYANT,
+                        SkillPath.GHOST,
+                        SkillPath.CAMP,
+                    ]:
+                        chance = max(1, int(chance / 2))
+                        print(f"{cat.name} {cat.skills.secondary.skill}")
+                        print(f"Chance updated to {chance}")
+
+                    if cat.skills.primary.path in [
+                        SkillPath.OMEN,
+                        SkillPath.PROPHET,
+                        SkillPath.HEALER,
+                        SkillPath.STAR,
+                        SkillPath.DREAM,
+                        SkillPath.CLAIRVOYANT,
+                        SkillPath.GHOST,
+                        SkillPath.CAMP,
+                    ]:
+                        chance = max(1, int(chance / 2))
+                        print(f"{cat.name} {cat.skills.primary.skill}")
+                        print(f"Chance updated to {chance}")
+
+                    if cat.personality.trait in [
+                        "ambitious",
+                        "compassionate",
+                        "grumpy",
+                        "gloomy",
+                        "lonesome",
+                        "loving",
+                        "responsible",
+                        "righteous",
+                        "thoughtful",
+                        "wise",
+                    ]:
+                        chance = max(1, int(chance / 2))
+                        print(f"{cat.name} {cat.personality.trait}")
+                        print(f"Chance updated to {chance}")
+
+                    # check for a permanent condition
                     if cat.is_disabled():
-                        chance = int(chance / 2)
+                        chance = max(1, int(chance / 1.3))
+                        print(f"{cat.name} is disabled")
+                        print(f"Chance updated to {chance}")
 
-                    if chance == 0:
-                        chance = 1
+                    chance = max(chance, 1)
 
-                    if not has_med_app and not int(random.random() * chance):
+                    print(f"Final medcat app chance {cat.name}: {chance}")
+
+                    if not int(random.random() * chance):
                         self.ceremony(cat, CatRank.MEDICINE_APPRENTICE)
                         self.ceremony_accessory = True
-                        self.gain_accessories(cat, clan)
+                        self.gain_accessories(cat)
+                        print(f"Made {cat.name} medicine cat apprentice")
+
                     else:
                         # Chance for mediator apprentice
                         mediator_list = list(
@@ -1521,39 +1613,113 @@ class Events:
 
                         # This checks if at least one mediator already has an apprentice.
                         has_mediator_apprentice = False
+
                         for c in mediator_list:
                             if c.apprentice:
                                 has_mediator_apprentice = True
-                                break
 
-                        chance = constants.CONFIG["roles"]["mediator_app_chance"]
-                        if cat.personality.trait in [
-                            "charismatic",
-                            "loving",
-                            "responsible",
-                            "wise",
-                            "thoughtful",
-                        ]:
-                            chance = int(chance / 1.5)
-                        if cat.is_disabled():
-                            chance = int(chance / 2)
+                        chance = max(
+                            constants.CONFIG["roles"]["mediator_app_chance"], 1
+                        )
 
-                        if chance == 0:
-                            chance = 1
+                        if mediator_list and not has_mediator_apprentice:
+                            print(f"Mediator app {cat.name} starting chance: {chance}")
 
-                        # Only become a mediator if there is already one in the clan.
-                        if (
-                            mediator_list
-                            and not has_mediator_apprentice
-                            and not int(random.random() * chance)
-                        ):
-                            self.ceremony(cat, CatRank.MEDIATOR_APPRENTICE)
-                            self.ceremony_accessory = True
-                            self.gain_accessories(cat, clan)
+                            # check for incompatible traits and skills
+                            if cat.personality.trait in [
+                                "ambitious",
+                                "adventurous",
+                                "arrogant",
+                                "bold",
+                                "bloodthirsty",
+                                "cold",
+                                "competitive",
+                                "grumpy",
+                                "insecure",
+                                "oblivious",
+                            ]:
+                                chance = max(1, int(chance * 2))
+                                print(f"{cat.name} {cat.personality.trait}")
+                                print(f"Chance updated to {chance}")
+
+                            if cat.skills.primary.path in [
+                                SkillPath.HUNTER,
+                                SkillPath.FIGHTER,
+                                SkillPath.CLIMBER,
+                                SkillPath.SWIMMER,
+                                SkillPath.DARK,
+                            ]:
+                                chance = max(1, int(chance * 1.5))
+                                print(f"{cat.name} {cat.skills.primary.skill}")
+                                print(f"Chance updated to {chance}")
+
+                            # check for compatible traits and skills
+                            if cat.personality.trait in [
+                                "calm",
+                                "charismatic",
+                                "flamboyant",
+                                "nervous",
+                                "playful",
+                                "thoughtful",
+                                "sincere",
+                                "wise",
+                            ]:
+                                chance = max(1, int(chance / 1.5))
+                                print(f"{cat.name} {cat.personality.trait}")
+                                print(f"Chance updated to {chance}")
+
+                            if cat.skills.secondary and cat.skills.secondary.path in [
+                                SkillPath.MEDIATOR,
+                                SkillPath.SPEAKER,
+                                SkillPath.INSIGHTFUL,
+                                SkillPath.CLAIRVOYANT,
+                                SkillPath.LORE,
+                            ]:
+                                chance = int(chance / 1.5)
+                                print(f"{cat.name} {cat.skills.secondary.skill}")
+                                print(f"Chance updated to {chance}")
+
+                            if cat.skills.primary.path in [
+                                SkillPath.MEDIATOR,
+                                SkillPath.SPEAKER,
+                                SkillPath.INSIGHTFUL,
+                                SkillPath.CLAIRVOYANT,
+                                SkillPath.LORE,
+                            ]:
+                                chance = int(chance / 2)
+                                print(f"{cat.name} {cat.skills.primary.skill}")
+                                print(f"Chance updated to {chance}")
+
+                            # check for a permanent condition
+                            if cat.is_disabled():
+                                chance = int(chance / 1.3)
+                                print(f"{cat.name} is disabled")
+                                print(f"Chance updated to {chance}")
+
+                            chance = max(1, chance)
+                            print(f"Final mediator app chance {cat.name}: {chance}")
+
+                            # Only become a mediator if the check succeeds
+                            if not int(random.random() * chance):
+                                self.ceremony(cat, CatRank.MEDIATOR_APPRENTICE)
+                                self.ceremony_accessory = True
+                                self.gain_accessories(cat)
+                                print(f"Made {cat.name} mediator apprentice")
+
+                            # make them a warrior apprentice
+                            else:
+                                self.ceremony(cat, CatRank.APPRENTICE)
+                                self.ceremony_accessory = True
+                                self.gain_accessories(cat)
+                                print(f"Made {cat.name} warrior apprentice")
+
+                        # this part should be reached whenever there are
+                        # no mediators
                         else:
                             self.ceremony(cat, CatRank.APPRENTICE)
                             self.ceremony_accessory = True
-                            self.gain_accessories(cat, clan)
+                            self.gain_accessories(cat)
+                            print(f"Made {cat.name} warrior apprentice, second check")
 
             # graduate
             if cat.status.rank.is_any_apprentice_rank():
