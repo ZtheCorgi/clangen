@@ -13,7 +13,7 @@ from strenum import StrEnum  # pylint: disable=no-name-in-module
 
 import os
 import ujson
-from scripts.game_structure.game_essentials import game
+from scripts.game_structure import game
 from scripts.housekeeping.datadir import get_save_dir
 from scripts.game_structure.game.save_load import safe_save
 from scripts.utility import adjust_list_text
@@ -89,7 +89,7 @@ class Inheritance:
         elif len(switch_get_value(Switch.clan_list)) > 0:
             clanname = switch_get_value(Switch.clan_list)[0]
         elif game.clan is not None:
-            clanname = game.clan.name
+            clanname = game.clan.displayname
 
         family_directory = get_save_dir() + "/" + clanname + "/inheritance"
         family_file_path = family_directory + "/" + self.cat.ID + "_inheritance.json"

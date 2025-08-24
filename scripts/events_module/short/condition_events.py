@@ -28,7 +28,7 @@ from scripts.game_structure.game.switches import (
     switch_set_value,
     switch_append_list_value,
 )
-from scripts.game_structure.game_essentials import game
+from scripts.game_structure import game
 from scripts.game_structure.localization import load_lang_resource
 from scripts.utility import (
     event_text_adjust,
@@ -912,12 +912,12 @@ class Condition_Events:
 
                 if cat.status.rank != CatRank.LEADER:
                     cat.history.add_death(
-                        death_text=i18n.t("defaults.complications_death_history"),
+                        death_text=i18n.t("defaults.complications_death_history", condition=translated_condition),
                         condition=translated_condition,
                     )
                 else:
                     cat.history.add_death(
-                        death_text=i18n.t("defaults.complications_death_history"),
+                        death_text=i18n.t("defaults.complications_death_history_leader", condition=translated_condition),
                         condition=translated_condition,
                     )
 
@@ -1053,7 +1053,7 @@ class Condition_Events:
                     cat_dict = {"m_c": cat}
                     if cat.age == CatAge.ADOLESCENT:
                         event = i18n.t(
-                            "hardcoded.condition_retire_adolescent", name=cat.name
+                            "hardcoded.condition_retire_adolescent", name=str(cat.name)
                         )
                     elif clan.leader is not None:
                         if (
@@ -1072,7 +1072,7 @@ class Condition_Events:
                             cat.name.give_suffix(cat.skills, cat.personality, game.clan.biome, "hard work")
                         event += i18n.t(
                             "hardcoded.condition_retire_adolescent_ceremony",
-                            clan=clan.name,
+                            clan=clan.displayname,
                             newname=cat.name.prefix + cat.name.suffix,
                         )
 
@@ -1172,7 +1172,8 @@ class Condition_Events:
                     # if it is a progressive condition, then remove the old condition and keep the new one
                     if (
                         condition in progression
-                        and new_condition_name == progression.get(condition)
+                        and (new_condition_name == progression.get(condition) or 
+                             (isinstance(progression.get(condition), list) and new_condition_name in progression.get(condition)))
                     ):
                         removed_condition = True
                         dictionary.pop(condition)

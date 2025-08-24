@@ -7,8 +7,8 @@ import i18n
 import scripts.game_structure.screen_settings
 from scripts.cat.sprites import sprites
 from scripts.game_structure import constants
-from scripts.game_structure.game_essentials import game
 from .phenotype import Phenotype
+from scripts.game_structure import game
 from scripts.game_structure.localization import get_lang_config
 from scripts.utility import adjust_list_text
 
@@ -496,7 +496,7 @@ class Pelt:
                                 white_pattern.append(order[i] + pawtype)
                             else:
                                 white_pattern.append(order[i] + choice([' toes', ' mitten', ' mitten', ' low sock']))
-                        white_pattern.append(choice(['belt', 'belt', 'pants'] + [None] * 9))
+                        white_pattern.append(choice(['belt', 'belt', 'pants'] + [None] * 12))
 
                         #face
                         if 'beard' in white_pattern:
@@ -515,7 +515,7 @@ class Pelt:
                         #belly
                         if 'underbelly1' not in white_pattern:
                             white_pattern.append('belly')
-                        white_pattern.append(choice(['belt', 'belt', 'pants'] + [None] * 5))
+                        white_pattern.append(choice(['belt', 'belt', 'pants'] + [None] * 7))
 
                         #paws
                         nropaws = choice([4, 4, 4, 4, 3, 3, 2, 2, 1, 0])
@@ -546,7 +546,7 @@ class Pelt:
                     while len(white_pattern) < 4:
                         #chest
                         white_pattern.append('underbelly1')
-                        white_pattern.append(choice(['belt', 'belt', 'pants'] + [None] * 3))
+                        white_pattern.append(choice(['belt', 'belt', 'pants'] + [None] * 7))
 
                         #paws
                         nropaws = 4
@@ -572,6 +572,9 @@ class Pelt:
                         white_pattern.append(choice([None, None, None, choice(['break/nose1', 'break/nose2'])]))
                         white_pattern = clean_white(white_pattern)
             else:
+                if "NoDBE" not in pax3 and (random() < 0.75):
+                    white_pattern = [choice(["REVERSEPANTS"])]
+
                 if(randint(1, 4) == 1):
                     white_pattern.append(choice(maingame_white["high"].get(str(KITgrade))))
 
@@ -579,7 +582,7 @@ class Pelt:
                     while len(white_pattern) < 4:
                         #chest
                         white_pattern.append('underbelly1')
-                        white_pattern.append(choice(['belt', 'belt', 'pants'] + [None] * 3))
+                        white_pattern.append(choice(['belt', 'belt', 'pants'] + [None] * 7))
 
                         #paws
                         nropaws = 4
@@ -801,7 +804,7 @@ class Pelt:
         if base_tints or color_tints:
             self.tint = choice(base_tints + color_tints)
         else:
-            self.tint = "none"
+            self.tint = None
 
         # WHITE PATCHES TINT
         # Now for white patches
@@ -812,10 +815,10 @@ class Pelt:
         else:
             color_tints = []
 
-        if base_tints or color_tints:
-            self.white_patches_tint = choice(base_tints + color_tints)
-        else:
-            self.white_patches_tint = "none"
+            if base_tints or color_tints:
+                self.white_patches_tint = choice(base_tints + color_tints)
+            else:
+                self.white_patches_tint = None
 
     @staticmethod
     def describe_appearance(cat, short=False):
@@ -837,5 +840,5 @@ class Pelt:
             for scar in cat.pelt.scars:
                 if scar in scar_details:
                     scarlist.append(i18n.t(f"cat.pelts.{scar}"))
-            color_name += ", with" + adjust_list_text(list(set(scarlist))) if len(scarlist) > 0 else "" # note: this doesn't preserve order!
+            color_name += ", with " + adjust_list_text(list(set(scarlist))) if len(scarlist) > 0 else "" # note: this doesn't preserve order!
         return color_name

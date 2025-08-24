@@ -48,6 +48,14 @@
         "When most kittens are learning to talk, m_c seems delayed. r_c is called, and {PRONOUN/r_c/subject} {VERB/r_c/report/reports} that while m_c will live life just fine, it appears {PRONOUN/m_c/subject}{VERB/m_c/'ve/'s} never been able to hear.",
         "m_c isn't bothered by being deaf, though the Clan seems to want to comfort {PRONOUN/m_c/object} when everyone finds out that's why learning to talk has been so hard."
     ],
+    "partial hearing loss in one ear": [
+        "r_c is called in to assess m_c's hearing. While it seems fine, m_c often seems to turn {PRONOUN/m_c/poss} head one way to listen.",
+        "m_c often turns {PRONOUN/m_c/poss} head when listening, until it's clear that {PRONOUN/m_c/poss} hearing is limited in one ear."
+    ],
+    "deaf in one ear": [
+        "r_c is called in to assess m_c's hearing. While it seems fine, m_c always turns {PRONOUN/m_c/poss} head away one way to listen.",
+        "m_c often turns {PRONOUN/m_c/poss} head when listening, until it's clear that {PRONOUN/m_c/poss} hearing is limited to one ear."
+    ],
     "constant joint pain": [
         "m_c's worried parent calls in r_c after weeks of constant pain. r_c can provide pain relief, but it's possible this may be a constant in m_c's life.",
         "m_c refuses once again to go out and play, {PRONOUN/m_c/poss} joints swollen and painful. It's becoming clear that it's not an isolated instance, and m_c might need some help."
@@ -67,6 +75,17 @@
     "crooked jaw": [
         "m_c's jaw never seemed to close quite right, and {PRONOUN/m_c/subject}{VERB/m_c/'re/'s} definitely not growing out of it.",
         "m_c has always had trouble suckling, but the reason why is only now starting to be really apparent."
+    ],
+    "strange lump": [
+        "m_c developed a new lump on {PRONOUN/m_c/poss} body. It doesn't look good.",
+        "r_c isn't sure where this lump on {PRONOUN/m_c/poss} body came from, but m_c isn't sure it's good news.",
+        "m_c complains about being unable to sleep properly, leading r_c to find a strange lump on {PRONOUN/m_c/object}. It's not good news.",
+        "m_c won't let r_c see the new lump that appeared on {PRONOUN/m_c/poss} body."
+    ],
+    "absent": [
+        "m_c has been getting more and more forgetful lately. {PRONOUN/m_c/subject/CAP} is starting to fade.",
+        "r_c has to repeat m_c's name several times to get {PRONOUN/m_c/poss} attention, quietly concerned about how long it takes {PRONOUN/m_c/object} to respond.",
+        "m_c has trouble remembering where {PRONOUN/m_c/poss} nest is. r_c takes note- m_c has been fading fast."
     ],
     "rabbit gait": [
         "m_c has been hopping with a rabbit-like gait. It was cute at first, but by now it's clear that it's not going away.",
@@ -107,6 +126,6 @@
     ],
     "flat nose": [
         "r_c sadly confirms that there's not much {PRONOUN/r_c/subject} can do for m_c, despite how the kitten struggles to breath through {PRONOUN/m_c/poss} flattened nose and tires quickly.",
-        "Some hoped m_c's odd muzzle was just visual quirk, but m_c struggles to keep up and stay active the way other kittens do, tiring easily and struggling to get used to solider food."
+        "Some hoped m_c's odd muzzle was just visual quirk, but m_c struggles to keep up and stay active the way other kittens do, tiring easily and struggling to get used to more solid food."
     ]
 }
